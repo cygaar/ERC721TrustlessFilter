@@ -19,7 +19,11 @@ abstract contract ERC721TrustlessFilter is ERC721, Ownable {
 
     uint256 public minBlockVotesNeeded;
 
-    function _beforeTokenTransfer(address from, address to, uint256 tokenId, uint256) internal virtual override (ERC721) {
+    function _beforeTokenTransfer(address from, address to, uint256 tokenId, uint256)
+        internal
+        virtual
+        override (ERC721)
+    {
         if (from != address(0) && to != address(0) && !mayTransfer(msg.sender)) {
             revert("ERC721TrustlessFilter: illegal operator");
         }
@@ -33,11 +37,7 @@ abstract contract ERC721TrustlessFilter is ERC721, Ownable {
         uint256 allowTotal = operatorVote.allowTotal;
         uint256 blockTotal = operatorVote.blockTotal;
 
-        if (blockTotal < minBlockVotesNeeded) {
-            // Not enough votes cast
-            return true;
-        }
-        return blockTotal <= allowTotal;
+        return blockTotal < minBlockVotesNeeded || blockTotal <= allowTotal;
     }
 
     function vote(address operator, uint256 tokenId, bool newVote) external {
